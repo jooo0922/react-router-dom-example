@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import { BrowserRouter, Route, Switch, Link } from "react-router-dom";
+import { HashRouter, Route, Switch, Link } from "react-router-dom";
 
 function Home() {
   return (
@@ -65,9 +65,9 @@ function App() {
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <App />
-    </BrowserRouter>
+    </HashRouter>
   </React.StrictMode>,
   document.getElementById("root")
 );
@@ -205,4 +205,31 @@ reportWebVitals();
  * Single Page Application으로 자동으로 구현해주는 게 Link 컴포넌트임.
  *
  * 이 컴포넌트로 jsx의 a태그를 교체하고, href 대신 to 라는 속성을 써주면 됨!
+ */
+
+/**
+ * HashRouter vs BrowserRouter
+ *
+ * HashRouter
+ * -사용자가 어떤 path로 들어와도 웹 서버가 동일한 웹페이지를 서비스할 수 없는 경우
+ * -정적인 페이지에 적합.
+ * -주소에 #이 붙음.
+ * -웹 서버가 # 이후의 url을 읽지 못함. 무시함. but, js를 이용해서 가져오는 것.
+ * -그래서 검색 엔진이 못읽음.
+ * -그래서 어지간하면 거의 사용하지 않음.
+ * -github pages와 같은 정적 페이지를 배포해서 보여줄 때 사용하기 간편함.
+ *
+ * BrowserRouter
+ * -사용자가 어떤 path로 들어와도 웹 서버가 root 폴더에 있는 동일한 html 파일을 서비스할 수 있는 경우
+ * -동적인 페이지에 적합.
+ * -새로고침 시 경로를 찾지 못해서 에러 발생함.
+ * -검색 엔진이 읽을 수 있음.
+ * -github pages에서 사용하기 복잡함.
+ *
+ * -> 생활코딩에서는 각각의 첫번째 차이점에 대해서만 설명을 했는데
+ * 추가적으로 구글링해서 찾아보니 다음과 같은 차이점들이 있었음.
+ * 정확히 차이점이 와닿지는 않기 때문에 나중에 복습하거나 사용해보면서 알아봐야 할 듯...
+ *
+ * 일단 최근에는 리액트 앱에서 Routing 하는 로직들에서는
+ * 거의 대부분 BrowserRouter를 사용한다는 것만 알아두면 될 것 같음.
  */
