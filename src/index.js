@@ -2,7 +2,14 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import { BrowserRouter, Route, Switch, Link, NavLink } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Switch,
+  Link,
+  NavLink,
+  useParams,
+} from "react-router-dom";
 
 function Home() {
   return (
@@ -13,11 +20,56 @@ function Home() {
   );
 }
 
+// 이렇게 전역변수로 리스트들을 만들 때 사용할 배열을 만들어놓음.
+// 실제 현실에서는 ajax 같은 거로 데이터를 가져오는 경우가 많겠지
+let contents = [
+  { id: 1, title: "HTML", description: "HTML is ..." },
+  { id: 2, title: "JS", description: "JS is ..." },
+  { id: 3, title: "React", description: "React is ..." },
+];
+
+function Topic() {
+  const params = useParams(); // 이렇게 하면 {topic_id: '아이디값'} 이렇게 생긴 객체를 리턴받음.
+  const topic_id = params.topic_id;
+  let selected_topic = {
+    title: "Sorry",
+    description: "Not Found",
+  }; // 반복문을 돌면서 선택된 topic_id에 맞는 데이터를 가져와 할당할 변수.
+  // 일단 초기에는 기본값인 문자열들을 넣어놨음. 또는 for 문을 돌더라도 값을 찾지 못했을 때 나올 예외적인 페이지이기도 함.
+  for (let i = 0; i < contents.length; i++) {
+    // 참고로 topic_id 값이 문자열로 리턴되므로, Number를 이용해 숫자 객체로 바꿔줘야 함.
+    if (contents[i].id === Number(topic_id)) {
+      selected_topic = contents[i]; // 이렇게만 해줘도 contents[i]에 있는 key의 이름이 동일한 value들을 selected_topic에 할당해줄 수 있나 봄.
+      break;
+    }
+  }
+  return (
+    <div>
+      <h3>{selected_topic.title}</h3>
+      {selected_topic.description}
+    </div>
+  );
+}
+
 function Topics() {
+  let lis = [];
+  for (let i = 0; i < contents.length; i++) {
+    // 이런 식으로 for 문을 돌려서 NavLink 리스트를 만들거면 li 태그에 key라는 props를 각각 줘야하나 봄... 안 그러면 에러가 자꾸 뜸.
+    lis.push(
+      <li key={contents[i].id}>
+        <NavLink to={"/topics/" + contents[i].id}>{contents[i].title}</NavLink>
+      </li>
+    );
+  } // 이렇게 반복문을 활용해서 NavList를 직접 만들어서 배열 안에 담아놓고, 그걸 jsx에 사용하면 더 효율적인 리팩토링이 된 것이지!
+
   return (
     <div>
       <h2>Topics</h2>
       Topics...
+      <ul>{lis}</ul>
+      <Route path="/topics/:topic_id">
+        <Topic></Topic>
+      </Route>
     </div>
   );
 }
@@ -254,4 +306,46 @@ reportWebVitals();
  * css로 사용자가 현재 위치하고 있는 NavLink를 표시해줄 수 있다는거임. 별 대단한 건 아니네ㅋㅋㅋ
  *
  * 그래도 그냥 Link보다는 이거를 주로 더 많이 쓴다고 함.
+ */
+
+/**
+ * 라우터 안의 라우터 중첩
+ *
+ * Topics 컴포넌트 안에 Switch로 묶여있는 라우트들을 보면
+ * 라우터 안에 라우터를 중첩하여 사용할 수 있다는 것을 알 수 있음.
+ *
+ *
+ * useParams (Hook을 활용한 리팩토링)
+ *
+ * 여기서 Topics 내의 Route들 처럼 3개 정도만 있으면 그냥 직접 작성해줘도 되는데,
+ * 만약 1억개의 Route 들이 있다면? 직접 써주기 어렵겠지?
+ *
+ * 이런 경우 배열을 하나 만들어서 NavLink 리스트들이 만들어지고,
+ * 또 그에 따라 자동으로 Route 들이 만들어지도록 하면 됨.
+ *
+ * 즉, Route는 하나만 만들어놓고,
+ * 배열로 만든 NavLink 리스트들 중 하나로부터 받은 path가 무엇인지에 따라
+ * 그 정보를 가져와서 Route를 즉석에서 만들어서 처리하는 방식이라는 거지!
+ * -> 이럴 때 쓰는 게 <Route path="/어쩌구/:특정_id"> 인 것!
+ *
+ * 이걸 왜 쓰냐면, 만약 <Route path="/topics/:topic_id"> 라는 Route 컴포넌트가 있다고 치면,
+ * 저 컴포넌트가 의미하는 건,
+ * "만약 /topics/ 로 시작하는 path 중에 뒤에 어떤 값(:topic_id)이 있는
+ * path가 들어온다면, 저 라우트 컴포넌트를 라우팅하여라" 라는 뜻!
+ *
+ * 그래서 저 id값에 따라 위에서 만든 배열로부터 정보를 가져온 뒤,
+ * 컴포넌트를 가공해서 해당 Route 안에 뿌려주면 되는거야!
+ * 위의 예제로 치면 그 가공되는 컴포넌트는 Topic 인거지..
+ *
+ * 그럼 저 값, 즉 :topic_id가 뭔지 어떻게 알아낼 수 있을까?
+ * 저걸 알아야 id값으로 구분하든말든 하지!
+ * -> 이 때 사용하는 게 useParams 라는 Hook 을 이용하면 됨!
+ *
+ * <Route path="/topics/:topic_id">
+ *  <Topic></Topic>
+ * </Route>
+ * 이 구조상에서, 해당 라우트 컴포넌트가 감싸고 있는 가공할 컴포넌트의 함수 안에서
+ * useParams()를 호출하면, {topic_id: '아이디값'} 이런 객체를 리턴받게 됨.
+ * 이거를 위에 Topic 함수 내에서 작성한 코드처럼 배열에서 정보를 가져와서
+ * 반복문을 돌려서 컴포넌트를 가공해주는 식으로 만들면 됨!
  */
