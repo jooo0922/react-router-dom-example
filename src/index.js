@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import { HashRouter, Route, Switch, Link } from "react-router-dom";
+import { BrowserRouter, Route, Switch, Link, NavLink } from "react-router-dom";
 
 function Home() {
   return (
@@ -38,13 +38,15 @@ function App() {
       <ul>
         {/* 페이지 전환을 쉽게 하기 위해 만든 list UI */}
         <li>
-          <Link to="/">Home</Link>
+          <NavLink exact to="/">
+            Home
+          </NavLink>
         </li>
         <li>
-          <Link to="/topics">Topics</Link>
+          <NavLink to="/topics">Topics</NavLink>
         </li>
         <li>
-          <Link to="/contact">Contact</Link>
+          <NavLink to="/contact">Contact</NavLink>
         </li>
       </ul>
       <Switch>
@@ -65,9 +67,9 @@ function App() {
 
 ReactDOM.render(
   <React.StrictMode>
-    <HashRouter>
+    <BrowserRouter>
       <App />
-    </HashRouter>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
 );
@@ -232,4 +234,24 @@ reportWebVitals();
  *
  * 일단 최근에는 리액트 앱에서 Routing 하는 로직들에서는
  * 거의 대부분 BrowserRouter를 사용한다는 것만 알아두면 될 것 같음.
+ */
+
+/**
+ * NavLink
+ *
+ * Link 컴포넌트에서 약간의 기능이 추가된 컴포넌트라고 보면 됨.
+ * 클릭할 때마다 Element 탭에서 해당하는 a태그에 class="active"가 추가되는 것을 확인할 수 있음.
+ *
+ * 이때, Topics, Contact를 클릭하면 Home 에도 클래스가 추가되는데,
+ * 이는 Route 컴포넌트와 마찬가지 이유로 path="/" 인 애들은
+ * http://localhost:3000/topics 에서도, http://localhost:3000/contact 에서도 모두 걸리는 path이기 때문임.
+ *
+ * 따라서 Home으로 향하도록 지정한 NavLink에도 exact를 붙여줘야 이러한 문제를 해결할 수 있음.
+ * 물론 다른 태그에도 exact를 붙여줘도 좋지만 그냥 귀찮으니까 Home에만 붙여주는거고!
+ *
+ * -> 그럼 어쨋거나 이 active 클래스를 이용해서 뭘 할 수 있는데?
+ * 사용자가 자신이 어떤 페이지에 위치하는지 직관적으로 이해할 수 있게
+ * css로 사용자가 현재 위치하고 있는 NavLink를 표시해줄 수 있다는거임. 별 대단한 건 아니네ㅋㅋㅋ
+ *
+ * 그래도 그냥 Link보다는 이거를 주로 더 많이 쓴다고 함.
  */
